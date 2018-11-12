@@ -1,32 +1,13 @@
 <template>
 <div>
   <Card>
-    <h1>焱猫矿池后台系统</h1>
-    <!-- <Row type="flex">
+    <Row type="flex">
       <Col :lg="{span:8,offset:16}">
       <Input search enter-button placeholder="输入钱包地址..." />
       </Col>
     </Row>
     <Tabs value="name1" type="card" :animated="false">
-      <TabPane label="( UU端口 ) 矿池收益" name="name1">
-        <Tag type="dot" color="primary">总暴块数 : {{EtableDataBlockSum}}</Tag>
-        <Tag type="dot" color="success">总区块收益 : {{EtableDataQuKuaiSum}}</Tag>
-        <Tag type="dot" color="error">总支付的矿工费 : {{EtableDataMillerSum}}</Tag>
-        <Tag type="dot" color="warning">总矿池盈利 : {{EtableDataEarningsSum}}</Tag>
-        <Row type="flex" justify="center" style="margin-top:1rem">
-          <Col span="24">
-          <Card>
-            <tables ref="tables" :loading="loading" size="small" border searchable search-place="top" v-model="EtableDataSmall" :columns="Ecolumns" />
-            <div style="margin: 10px;overflow: hidden">
-              <div style="float: right;">
-                <Page :total="EtableData.length" :current="current1" :page-size-opts="[10,50,100]" placement="top" @on-change="changePage1" show-sizer :page-size="pageSize1" @on-page-size-change="changeSize1"></Page>
-              </div>
-            </div>
-          </Card>
-          </Col>
-        </Row>
-      </TabPane>
-      <TabPane label="( HC端口 ) 矿池收益" name="name2">
+      <TabPane label="( HC端口 ) 矿池收益" name="name1">
         <Tag type="dot" color="primary">总暴块数 : {{HtableDataBlockSum}}</Tag>
         <Tag type="dot" color="success">总区块收益 : {{HtableDataQuKuaiSum}}</Tag>
         <Tag type="dot" color="error">总支付的矿工费 : {{HtableDataMillerSum}}</Tag>
@@ -44,7 +25,7 @@
           </Col>
         </Row>
       </TabPane>
-      <TabPane label="钱包收益" name="name3">
+      <TabPane label="钱包收益" name="name2">
         <Row type="flex" justify="center">
           <Col span="24">
           <Card>
@@ -58,7 +39,7 @@
           </Col>
         </Row>
       </TabPane>
-    </Tabs> -->
+    </Tabs>
   </Card>
   <Modal v-model="modal" :title="title" @on-ok="ok" @on-cancel="cancel" width="1000px">
     <Row type="flex" justify="center">
@@ -82,7 +63,8 @@ import Tables from '_c/tables'
 import {
   Wallent, // 获取所有的钱包信息
   Expense, // 矿池收益信息
-  HC_Expense // 火池矿池收益信息
+  HC_Expense, // 火池矿池收益信息
+  HC_Wallent, // 火池矿池收益信息
 } from '@/api/data'
 export default {
   name: 'tables_page',
@@ -104,28 +86,13 @@ export default {
           width: 330
         },
         {
-          title: '实时算力',
-          key: 'hr1',
-          width: 100
-        },
-        {
-          title: '24小时平均算力',
-          key: 'hr2',
+          title: '总收益',
+          key: 'total_reward',
           width: 150
         },
         {
-          title: '在线矿工',
-          key: 'online',
-          width: 100
-        },
-        {
-          title: '离线矿工',
-          key: 'offline',
-          width: 100
-        },
-        {
-          title: '总收益',
-          key: 'paid',
+          title: '昨日收益',
+          key: 'reward',
           width: 150
         },
         {
@@ -133,26 +100,6 @@ export default {
           key: 'lastshare',
           width: 200
         },
-        {
-          title: '操作',
-          key: 'lastshare',
-          width: 100,
-          render: (h, params) => {
-            return h('div', [
-              h('Button', {
-                props: {
-                  type: 'success',
-                  size: 'small',
-                },
-                on: {
-                  'click': () => {
-                    this.show(params.row.payments, params.row.wallet)
-                  }
-                }
-              }, '查看收益')
-            ])
-          }
-        }
       ],
       Ecolumns: [{
           title: '序号',
@@ -391,41 +338,7 @@ export default {
     },
   },
   mounted() {
-    Expense().then(res => {
-        function sum(a, b) {
-          return a + b
-        }
-        let BlockSum = []
-        let QuKuaiSum = []
-        let MillerSum = []
-        console.log(res)
-        res.data.data.forEach((item) => {
-          this.EtableData.push({
-            'id': item.id,
-            'num': item.num,
-            'reward': item.reward,
-            'amount_s': item.amount_s,
-            'amount': item.amount,
-            'time': item.time,
-            'earnings': (item.reward - item.amount_s).toFixed(6)
-          })
-          BlockSum.push(item.num)
-          QuKuaiSum.push(Number(item.reward))
-          MillerSum.push(Number(item.amount_s))
-          this.loading = false
-        })
-        console.log(QuKuaiSum);
-        this.EtableDataBlockSum = BlockSum.reduce(sum)
-        this.EtableDataQuKuaiSum = QuKuaiSum.reduce(sum)
-        this.EtableDataMillerSum = MillerSum.reduce(sum)
-        this.EtableDataEarningsSum = (this.EtableDataQuKuaiSum - this.EtableDataMillerSum)
-        if (this.EtableData.length > 0) {
-          for (let i = 0; i < (this.EtableData.length >= this.pageSize1 ? this.pageSize1 : this.EtableData.length); i++) {
-            this.EtableDataSmall.push(this.EtableData[i])
-          }
-        }
-      }),
-      HC_Expense().then(res => {
+    HC_Expense().then(res => {
         console.log(res, "火池");
 
         function sum(a, b) {
@@ -462,18 +375,14 @@ export default {
           }
         }
       }),
-      Wallent().then(res => {
-        console.log(res)
+      HC_Wallent().then(res => {
+        console.log(res, "火池钱包")
         res.data.forEach((item) => {
           this.tableData.push({
-            'hr1': item.hr1,
-            'hr2': item.hr2,
-            'offline': item.offline,
-            'online': item.online,
-            'paid': item.paid,
-            'wallet': item.wallet,
-            'lastshare': item.lastshare,
-            'payments': item.payments,
+            'wallet': item.wallet, //钱包地址
+            'total_reward': item.total_reward, //总说一
+            'reward': item.reward, //昨日收益
+            'lastshare': item.lastshare, //最后提交时间
           })
         })
         if (this.tableData.length > 0) {

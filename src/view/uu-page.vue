@@ -1,8 +1,7 @@
 <template>
 <div>
   <Card>
-    <h1>焱猫矿池后台系统</h1>
-    <!-- <Row type="flex">
+    <Row type="flex">
       <Col :lg="{span:8,offset:16}">
       <Input search enter-button placeholder="输入钱包地址..." />
       </Col>
@@ -26,24 +25,6 @@
           </Col>
         </Row>
       </TabPane>
-      <TabPane label="( HC端口 ) 矿池收益" name="name2">
-        <Tag type="dot" color="primary">总暴块数 : {{HtableDataBlockSum}}</Tag>
-        <Tag type="dot" color="success">总区块收益 : {{HtableDataQuKuaiSum}}</Tag>
-        <Tag type="dot" color="error">总支付的矿工费 : {{HtableDataMillerSum}}</Tag>
-        <Tag type="dot" color="warning">总矿池盈利 : {{HtableDataEarningsSum}}</Tag>
-        <Row type="flex" justify="center" style="margin-top:1rem">
-          <Col span="24">
-          <Card>
-            <tables ref="tables" :loading="loading" size="small" border searchable search-place="top" v-model="HtableDataSmall" :columns="Hcolumns" />
-            <div style="margin: 10px;overflow: hidden">
-              <div style="float: right;">
-                <Page :total="HtableData.length" :current="current3" :page-size-opts="[10,50,100]" placement="top" @on-change="changePage3" show-sizer :page-size="pageSize3" @on-page-size-change="changeSize3"></Page>
-              </div>
-            </div>
-          </Card>
-          </Col>
-        </Row>
-      </TabPane>
       <TabPane label="钱包收益" name="name3">
         <Row type="flex" justify="center">
           <Col span="24">
@@ -58,7 +39,7 @@
           </Col>
         </Row>
       </TabPane>
-    </Tabs> -->
+    </Tabs>
   </Card>
   <Modal v-model="modal" :title="title" @on-ok="ok" @on-cancel="cancel" width="1000px">
     <Row type="flex" justify="center">
@@ -82,10 +63,11 @@ import Tables from '_c/tables'
 import {
   Wallent, // 获取所有的钱包信息
   Expense, // 矿池收益信息
+  ExpenseTotal, // uu矿池总收益信息
   HC_Expense // 火池矿池收益信息
 } from '@/api/data'
 export default {
-  name: 'tables_page',
+  name: 'uu_page',
   components: {
     Tables
   },
@@ -197,64 +179,6 @@ export default {
           width: 300
         }
       ],
-      Hcolumns: [{
-          title: '序号',
-          type: 'index',
-          key: 'num',
-          width: 70,
-          fixed: 'left',
-        }, {
-          title: '区块数',
-          key: 'num',
-          width: 100,
-        },
-        {
-          title: '矿工数',
-          key: 'workers',
-          width: 150
-        },
-        {
-          title: '区块收益',
-          key: 'amount',
-          width: 200
-        },
-        {
-          title: '昨日支出',
-          key: 'reward',
-          width: 200
-        },
-        {
-          title: '手续费',
-          key: 'service',
-          width: 200
-        },
-        {
-          title: '盈利值',
-          key: 'balance',
-          width: 300,
-          render: (h, params) => {
-            const row = params.row;
-            const color = row.balance > 0 ? 'success' : 'error';
-            const text = row.balance > 0 ? '盈利' : '亏损';
-            return h('Tag', {
-              props: {
-                type: 'dot',
-                color: color
-              }
-            }, row.balance + ' ' + text);
-          }
-        },
-        {
-          title: '开始时间',
-          key: 'Stime',
-          width: 300
-        },
-        {
-          title: '结束时间',
-          key: 'Etime',
-          width: 300
-        }
-      ],
       Pcolumns: [{
           title: '序号',
           type: 'index',
@@ -291,15 +215,6 @@ export default {
       EtableDataQuKuaiSum: 0,
       EtableDataMillerSum: 0,
       EtableDataEarningsSum: 0,
-      //火池矿池收益详情
-      HtableData: [],
-      HtableDataSmall: [],
-      current3: 1,
-      pageSize3: 10,
-      HtableDataBlockSum: 0,
-      HtableDataQuKuaiSum: 0,
-      HtableDataMillerSum: 0,
-      HtableDataEarningsSum: 0,
       //钱包收益详情
       title: '',
       PtableData: [],
@@ -331,12 +246,6 @@ export default {
     changeSize2(val) {
       this.pageSize2 = val
     },
-    changePage3(val) {
-      this.current3 = val
-    },
-    changeSize3(val) {
-      this.pageSize3 = val
-    },
     checkDataMax(a, b, c, d) { //a:当前显示的表格信息b:当前表格对应的所有信息c:当前的页数d:当前的每页显示数量
       a.splice(0, a.length) //清空当前的显示数据
       for (let i = d * (c - 1) + 1; i <= ((b.length > d * c) ? (d * c) : (b.length)); i++) {
@@ -356,10 +265,15 @@ export default {
     },
     ok() {
       this.$Message.info('确定');
+      this.PtableDataSmall = [];
+      this.PtableData = [];
+      this.current2 = 1;
+      this.pageSize2 = 10;
     },
     cancel() {
       this.$Message.info('取消');
       this.PtableDataSmall = [];
+      this.PtableData = [];
       this.current2 = 1;
       this.pageSize2 = 10;
     }
@@ -383,12 +297,6 @@ export default {
     pageSize2: function() {
       this.checkDataMax(this.PtableDataSmall, this.PtableData, this.current2, this.pageSize2)
     },
-    current3: function() {
-      this.checkDataMax(this.HtableDataSmall, this.HtableData, this.current3, this.pageSize3)
-    },
-    pageSize3: function() {
-      this.checkDataMax(this.HtableDataSmall, this.HtableData, this.current3, this.pageSize3)
-    },
   },
   mounted() {
     Expense().then(res => {
@@ -409,58 +317,20 @@ export default {
             'time': item.time,
             'earnings': (item.reward - item.amount_s).toFixed(6)
           })
-          BlockSum.push(item.num)
-          QuKuaiSum.push(Number(item.reward))
-          MillerSum.push(Number(item.amount_s))
           this.loading = false
         })
-        console.log(QuKuaiSum);
-        this.EtableDataBlockSum = BlockSum.reduce(sum)
-        this.EtableDataQuKuaiSum = QuKuaiSum.reduce(sum)
-        this.EtableDataMillerSum = MillerSum.reduce(sum)
-        this.EtableDataEarningsSum = (this.EtableDataQuKuaiSum - this.EtableDataMillerSum)
         if (this.EtableData.length > 0) {
           for (let i = 0; i < (this.EtableData.length >= this.pageSize1 ? this.pageSize1 : this.EtableData.length); i++) {
             this.EtableDataSmall.push(this.EtableData[i])
           }
         }
       }),
-      HC_Expense().then(res => {
-        console.log(res, "火池");
-
-        function sum(a, b) {
-          return a + b
-        }
-        let BlockSum = []
-        let QuKuaiSum = []
-        let MillerSum = []
-        console.log(res)
-        res.data.forEach((item) => {
-          this.HtableData.push({
-            'num': item.num,
-            'reward': item.reward,
-            'balance': item.balance_s,
-            'amount': item.amount,
-            'Stime': item.start_time,
-            'Etime': item.end_time,
-            'workers': item.workers,
-            'service': item.poundage,
-            'earnings': (item.reward - item.amount).toFixed(6)
-          })
-          BlockSum.push(item.num)
-          QuKuaiSum.push(Number(item.reward))
-          MillerSum.push(Number(item.amount))
-          this.loading = false
-        })
-        this.HtableDataBlockSum = BlockSum.reduce(sum)
-        this.HtableDataQuKuaiSum = QuKuaiSum.reduce(sum)
-        this.HtableDataMillerSum = MillerSum.reduce(sum)
-        this.HtableDataEarningsSum = (this.HtableDataQuKuaiSum - this.HtableDataMillerSum)
-        if (this.HtableData.length > 0) {
-          for (let i = 0; i < (this.HtableData.length >= this.pageSize1 ? this.pageSize1 : this.HtableData.length); i++) {
-            this.HtableDataSmall.push(this.HtableData[i])
-          }
-        }
+      ExpenseTotal().then(res => {
+        console.log(res, "总收益信息");
+        this.EtableDataBlockSum = res.data.msg.num
+        this.EtableDataQuKuaiSum = res.data.msg.reward
+        this.EtableDataMillerSum = res.data.msg.amount
+        this.EtableDataEarningsSum = res.data.msg.profit
       }),
       Wallent().then(res => {
         console.log(res)

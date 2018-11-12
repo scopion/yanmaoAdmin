@@ -1,5 +1,4 @@
 import axios from '@/libs/api.request'
-const url = 'http://ympool.com'
 
 export const getDragList = () => {
   return axios.request({
@@ -36,14 +35,35 @@ export const saveErrorLogger = info => {
 
 export const Wallent = () => { // 搜索钱包信息
   return axios.request({
-    url: url + '/api/public/pool_walletinfo',
+    url: '/api/public/pool_walletinfo',
     method: 'get'
   })
 }
 
 export const Expense = () => { // 搜索钱包信息
   return axios.request({
-    url: url + '/api/public/pool_expense',
+    url: '/api/public/pool_expense',
+    method: 'get'
+  })
+}
+
+export const ExpenseTotal = () => { // 搜索钱包信息
+  return axios.request({
+    url: '/api/public/pool_statistics',
+    method: 'get'
+  })
+}
+
+export const HC_Expense = () => { // 搜索钱包信息
+  return axios.request({
+    url: '/api/public/pool_block_hc',
+    method: 'get'
+  })
+}
+
+export const HC_Wallent = () => { // 搜索钱包信息
+  return axios.request({
+    url: '/api/public/pool_walletinfo_hc',
     method: 'get'
   })
 }

@@ -12,15 +12,15 @@ import parentView from '@/components/parent-view'
  * }
  */
 
-export default [
-  {
+export default [{
     path: '/login',
     name: 'login',
     meta: {
       title: 'Login - 登录',
       hideInMenu: true
     },
-    component: () => import('@/view/login/login.vue')
+    component: () =>
+      import ('@/view/login/login.vue')
   },
   {
     path: '/',
@@ -31,45 +31,59 @@ export default [
       hideInMenu: true,
       notCache: true
     },
-    children: [
-      {
-        path: '/home',
-        name: 'home',
-        meta: {
-          hideInMenu: true,
-          title: '首页',
-          notCache: true,
-          icon: 'md-home'
-        },
-        component: () => import('@/view/single-page/home')
-      }
-    ]
+    children: [{
+      path: '/home',
+      name: 'home',
+      meta: {
+        hideInMenu: true,
+        title: '首页',
+        notCache: true,
+        icon: 'md-home'
+      },
+      component: () =>
+        import ('@/view/single-page/home')
+    }]
   },
-  // {
-  //   path: '',
-  //   name: 'doc',
-  //   meta: {
-  //     title: '文档',
-  //     href: 'https://lison16.github.io/iview-admin-doc/#/',
-  //     icon: 'ios-book'
-  //   }
-  // },
-  // {
-  //   path: '/join',
-  //   name: 'join',
-  //   component: Main,
-  //   children: [
-  //     {
-  //       path: 'join_page',
-  //       name: 'join_page',
-  //       meta: {
-  //         icon: '_qq',
-  //         title: 'QQ群'
-  //       },
-  //       component: () => import('@/view/join-page.vue')
-  //     }
-  //   ]
-  // },
+  {
+    path: '/',
+    name: '_uu_page',
+    redirect: 'uu_page',
+    component: Main,
+    meta: {
+      // hideInMenu: true,
+      // notCache: true
+    },
+    children: [{
+      path: 'uu_page',
+      name: 'uu_page',
+      meta: {
+        icon: 'md-grid',
+        title: 'UU端口'
+      },
+      component: () =>
+        import ('@/view/uu-page.vue')
+    }, ]
+  },
+  {
+    path: '/',
+    name: '_hc_page',
+    redirect: 'hc_page',
+    component: Main,
+    meta: {
+      // notCache: true
+    },
+    children: [{
+      path: 'hc_page',
+      name: 'hc_page',
+      meta: {
+        icon: 'md-grid',
+        title: 'HC端口'
+      },
+      component: () =>
+        import ('@/view/hc-page.vue')
+    }, ]
+  },
+
   // {
   //   path: 'tables_page',
   //   name: 'tables_page',
@@ -366,8 +380,7 @@ export default [
       hideInMenu: true
     },
     component: Main,
-    children: [
-      {
+    children: [{
         path: 'params/:id',
         name: 'params',
         meta: {
@@ -376,7 +389,8 @@ export default [
           notCache: true,
           beforeCloseName: 'before_close_normal'
         },
-        component: () => import('@/view/argu-page/params.vue')
+        component: () =>
+          import ('@/view/argu-page/params.vue')
       },
       {
         path: 'query',
@@ -386,7 +400,8 @@ export default [
           title: route => `带参路由-${route.query.id}`,
           notCache: true
         },
-        component: () => import('@/view/argu-page/query.vue')
+        component: () =>
+          import ('@/view/argu-page/query.vue')
       }
     ]
   },
@@ -396,7 +411,8 @@ export default [
     meta: {
       hideInMenu: true
     },
-    component: () => import('@/view/error-page/401.vue')
+    component: () =>
+      import ('@/view/error-page/401.vue')
   },
   {
     path: '/500',
@@ -404,7 +420,8 @@ export default [
     meta: {
       hideInMenu: true
     },
-    component: () => import('@/view/error-page/500.vue')
+    component: () =>
+      import ('@/view/error-page/500.vue')
   },
   {
     path: '*',
@@ -412,6 +429,7 @@ export default [
     meta: {
       hideInMenu: true
     },
-    component: () => import('@/view/error-page/404.vue')
+    component: () =>
+      import ('@/view/error-page/404.vue')
   }
 ]

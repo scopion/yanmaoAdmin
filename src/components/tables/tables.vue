@@ -211,9 +211,9 @@ export default {
     handleClear (e) {
       if (e.target.value === '') this.insideTableData = this.value
     },
-    handleSearch () {
-      this.insideTableData = this.value.filter(item => item[this.searchKey].indexOf(this.searchValue) > -1)
-    },
+    // handleSearch () {
+    //   this.insideTableData = this.value.filter(item => item[this.searchKey].indexOf(this.searchValue) > -1)
+    // },
     handleTableData () {
       this.insideTableData = this.value.map((item, index) => {
         let res = item
@@ -259,13 +259,13 @@ export default {
     }
   },
   watch: {
-    columns (columns) {
-      this.handleColumns(columns)
-      this.setDefaultSearchKey()
-    },
+    // columns (columns) {
+    //   this.handleColumns(columns)
+    //   this.setDefaultSearchKey()
+    // },
     value (val) {
       this.handleTableData()
-      this.handleSearch()
+      // this.handleSearch()
     }
   },
   mounted () {
