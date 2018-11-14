@@ -1,11 +1,11 @@
 <template>
 <div>
   <Card>
-    <Row type="flex">
+    <!-- <Row type="flex">
       <Col :lg="{span:8,offset:16}">
       <Input search enter-button placeholder="输入钱包地址..." />
       </Col>
-    </Row>
+    </Row> -->
     <Tabs value="name1" type="card" :animated="false">
       <TabPane label="( UU端口 ) 矿池收益" name="name1">
         <Tag type="dot" color="primary">总暴块数 : {{EtableDataBlockSum}}</Tag>

@@ -1,11 +1,11 @@
 <template>
 <div>
   <Card>
-    <Row type="flex">
+    <!-- <Row type="flex">
       <Col :lg="{span:8,offset:16}">
       <Input search enter-button placeholder="输入钱包地址..." />
       </Col>
-    </Row>
+    </Row> -->
     <Tabs value="name1" type="card" :animated="false">
       <TabPane label="( HC端口 ) 矿池收益" name="name1">
         <Tag type="dot" color="primary">总暴块数 : {{HtableDataBlockSum}}</Tag>
@@ -81,26 +81,62 @@ export default {
           key: 'wallet',
           width: 70,
           fixed: 'left'
-        }, {
-          title: '钱包地址',
-          key: 'wallet',
-          width: 330
-        },
-        {
-          title: '总收益',
-          key: 'total_reward',
-          width: 150
-        },
-        {
-          title: '昨日收益',
-          key: 'reward',
-          width: 150
         },
         {
           title: '最后提交时间',
           key: 'lastshare',
           width: 200
         },
+        {
+          title: '钱包地址',
+          key: 'wallet',
+          width: 350
+        },
+        {
+          title: '实时算力',
+          key: 'hr1',
+          width: 200
+        },
+        {
+          title: '24小时平均算力',
+          key: 'hr2',
+          width: 150
+        },
+        {
+          title: '在线矿工',
+          key: 'online',
+          width: 100
+        },
+        {
+          title: '离线矿工',
+          key: 'offline',
+          width: 100
+        },
+        {
+          title: '总收益',
+          key: 'paid',
+          width: 150
+        },
+        {
+          title: '操作',
+          key: 'lastshare',
+          width: 100,
+          render: (h, params) => {
+            return h('div', [
+              h('Button', {
+                props: {
+                  type: 'success',
+                  size: 'small',
+                },
+                on: {
+                  'click': () => {
+                    this.show(params.row.payments, params.row.wallet)
+                  }
+                }
+              }, '查看收益')
+            ])
+          }
+        }
       ],
       Ecolumns: [{
           title: '序号',
@@ -172,12 +208,12 @@ export default {
         },
         {
           title: '区块收益',
-          key: 'amount',
+          key: 'reward',
           width: 100
         },
         {
           title: '昨日支出',
-          key: 'reward',
+          key: 'amount',
           width: 100
         },
         {
@@ -303,6 +339,7 @@ export default {
     cancel() {
       this.$Message.info('取消');
       this.PtableDataSmall = [];
+      this.PtableData = [];
       this.current2 = 1;
       this.pageSize2 = 10;
     }
@@ -371,10 +408,14 @@ export default {
         console.log(res, "火池钱包")
         res.data.forEach((item) => {
           this.tableData.push({
-            'wallet': item.wallet, //钱包地址
-            'total_reward': item.total_reward, //总说一
-            'reward': item.reward, //昨日收益
-            'lastshare': item.lastshare, //最后提交时间
+            'hr1': item.hr1,
+            'hr2': item.hr2,
+            'offline': item.offline,
+            'online': item.online,
+            'paid': item.paid,
+            'wallet': item.wallet,
+            'lastshare': item.lastshare,
+            'payments': item.payments,
           })
         })
         if (this.tableData.length > 0) {
