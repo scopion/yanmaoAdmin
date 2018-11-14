@@ -80,7 +80,13 @@ export default {
           key: 'wallet',
           width: 70,
           fixed: 'left'
-        }, {
+        },
+        {
+          title: '最后提交时间',
+          key: 'lastshare',
+          width: 200
+        },
+        {
           title: '钱包地址',
           key: 'wallet',
           width: 330
@@ -111,11 +117,6 @@ export default {
           width: 150
         },
         {
-          title: '最后提交时间',
-          key: 'lastshare',
-          width: 200
-        },
-        {
           title: '操作',
           key: 'lastshare',
           width: 100,
@@ -142,25 +143,31 @@ export default {
           key: 'num',
           width: 70,
           fixed: 'left',
-        }, {
+        },
+        {
+          title: '时间',
+          key: 'time',
+          width: 170
+        },
+        {
           title: '区块数',
           key: 'num',
-          width: 200,
+          width: 80,
         },
         {
           title: '区块收益',
           key: 'reward',
-          width: 250
+          width: 150
         },
         {
           title: '昨日支出',
           key: 'amount_s',
-          width: 250
+          width: 150
         },
         {
           title: '盈利值',
           key: 'earnings',
-          width: 300,
+          width: 200,
           render: (h, params) => {
             const row = params.row;
             const color = row.earnings > 0 ? 'success' : 'error';
@@ -173,11 +180,6 @@ export default {
             }, row.earnings + ' ' + text);
           }
         },
-        {
-          title: '时间',
-          key: 'time',
-          width: 300
-        }
       ],
       Pcolumns: [{
           title: '序号',

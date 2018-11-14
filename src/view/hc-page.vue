@@ -65,6 +65,7 @@ import {
   Expense, // 矿池收益信息
   HC_Expense, // 火池矿池收益信息
   HC_Wallent, // 火池矿池收益信息
+  HC_ExpenseTotal, //火池总收益信息
 } from '@/api/data'
 export default {
   name: 'tables_page',
@@ -108,6 +109,10 @@ export default {
           width: 70,
           fixed: 'left',
         }, {
+          title: '时间',
+          key: 'time',
+          width: 300
+        }, {
           title: '区块数',
           key: 'num',
           width: 200,
@@ -138,11 +143,7 @@ export default {
             }, row.earnings + ' ' + text);
           }
         },
-        {
-          title: '时间',
-          key: 'time',
-          width: 300
-        }
+
       ],
       Hcolumns: [{
           title: '序号',
@@ -151,6 +152,15 @@ export default {
           width: 70,
           fixed: 'left',
         }, {
+          title: '开始时间',
+          key: 'Stime',
+          width: 180
+        },
+        {
+          title: '结束时间',
+          key: 'Etime',
+          width: 180
+        }, {
           title: '区块数',
           key: 'num',
           width: 100,
@@ -158,27 +168,27 @@ export default {
         {
           title: '矿工数',
           key: 'workers',
-          width: 150
+          width: 100
         },
         {
           title: '区块收益',
           key: 'amount',
-          width: 200
+          width: 100
         },
         {
           title: '昨日支出',
           key: 'reward',
-          width: 200
+          width: 100
         },
         {
           title: '手续费',
           key: 'service',
-          width: 200
+          width: 100
         },
         {
           title: '盈利值',
           key: 'balance',
-          width: 300,
+          width: 200,
           render: (h, params) => {
             const row = params.row;
             const color = row.balance > 0 ? 'success' : 'error';
@@ -191,16 +201,6 @@ export default {
             }, row.balance + ' ' + text);
           }
         },
-        {
-          title: '开始时间',
-          key: 'Stime',
-          width: 300
-        },
-        {
-          title: '结束时间',
-          key: 'Etime',
-          width: 300
-        }
       ],
       Pcolumns: [{
           title: '序号',
@@ -234,10 +234,6 @@ export default {
       EtableDataSmall: [],
       current1: 1,
       pageSize1: 10,
-      EtableDataBlockSum: 0,
-      EtableDataQuKuaiSum: 0,
-      EtableDataMillerSum: 0,
-      EtableDataEarningsSum: 0,
       //火池矿池收益详情
       HtableData: [],
       HtableDataSmall: [],
@@ -340,10 +336,6 @@ export default {
   mounted() {
     HC_Expense().then(res => {
         console.log(res, "火池");
-
-        function sum(a, b) {
-          return a + b
-        }
         let BlockSum = []
         let QuKuaiSum = []
         let MillerSum = []
@@ -360,20 +352,20 @@ export default {
             'service': item.poundage,
             'earnings': (item.reward - item.amount).toFixed(6)
           })
-          BlockSum.push(item.num)
-          QuKuaiSum.push(Number(item.reward))
-          MillerSum.push(Number(item.amount))
           this.loading = false
         })
-        this.HtableDataBlockSum = BlockSum.reduce(sum)
-        this.HtableDataQuKuaiSum = QuKuaiSum.reduce(sum)
-        this.HtableDataMillerSum = MillerSum.reduce(sum)
-        this.HtableDataEarningsSum = (this.HtableDataQuKuaiSum - this.HtableDataMillerSum)
         if (this.HtableData.length > 0) {
           for (let i = 0; i < (this.HtableData.length >= this.pageSize1 ? this.pageSize1 : this.HtableData.length); i++) {
             this.HtableDataSmall.push(this.HtableData[i])
           }
         }
+      }),
+      HC_ExpenseTotal().then(res => {
+        console.log(res, "火池总收益信息");
+        this.HtableDataBlockSum = res.data.msg.num
+        this.HtableDataQuKuaiSum = res.data.msg.reward
+        this.HtableDataMillerSum = res.data.msg.amount
+        this.HtableDataEarningsSum = res.data.msg.profit
       }),
       HC_Wallent().then(res => {
         console.log(res, "火池钱包")

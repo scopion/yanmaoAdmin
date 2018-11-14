@@ -54,6 +54,13 @@ export const ExpenseTotal = () => { // 搜索钱包信息
   })
 }
 
+export const HC_ExpenseTotal = () => { // 搜索钱包信息
+  return axios.request({
+    url: '/api/public/pool_statistics_hc',
+    method: 'get'
+  })
+}
+
 export const HC_Expense = () => { // 搜索钱包信息
   return axios.request({
     url: '/api/public/pool_block_hc',
