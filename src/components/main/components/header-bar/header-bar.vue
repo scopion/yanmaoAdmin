@@ -1,6 +1,6 @@
 <template>
   <div class="header-bar">
-    <sider-trigger :collapsed="collapsed" icon="md-menu" @on-change="handleCollpasedChange"></sider-trigger>
+    <sider-trigger v-if="width>575" :collapsed="collapsed" icon="md-menu" @on-change="handleCollpasedChange"></sider-trigger>
     <custom-bread-crumb show-icon style="margin-left: 30px;" :list="breadCrumbList"></custom-bread-crumb>
     <div class="custom-content-con">
       <slot></slot>
@@ -13,6 +13,11 @@ import customBreadCrumb from './custom-bread-crumb'
 import './header-bar.less'
 export default {
   name: 'HeaderBar',
+  data(){
+    return {
+      width:document.body.clientWidth
+    }
+  },
   components: {
     siderTrigger,
     customBreadCrumb

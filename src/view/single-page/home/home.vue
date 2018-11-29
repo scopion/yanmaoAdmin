@@ -1,7 +1,7 @@
 <template>
 <div>
   <Card>
-    <h1>焱猫矿池后台系统</h1>
+    <img :src="width>575?pcImg:mobileImg" width="100%">
     <!-- <Row type="flex">
       <Col :lg="{span:8,offset:16}">
       <Input search enter-button placeholder="输入钱包地址..." />
@@ -91,6 +91,9 @@ export default {
   },
   data() {
     return {
+      width:document.body.clientWidth,
+      pcImg:require('../../../assets/images/pc.png'),
+      mobileImg:require('../../../assets/images/mobile.png'),
       loading: true,
       columns: [{
           title: '序号',
