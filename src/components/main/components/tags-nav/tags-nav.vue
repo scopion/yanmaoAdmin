@@ -1,52 +1,47 @@
 <template>
-  <div class="tags-nav">
-    <div class="close-con">
-      <Dropdown transfer @on-click="handleTagsOption" style="margin-top:7px;">
-        <Button size="small" type="text">
-          <Icon :size="18" type="ios-close-circle-outline" />
-        </Button>
-        <DropdownMenu slot="list">
-          <DropdownItem name="close-all">关闭所有</DropdownItem>
-          <DropdownItem name="close-others">关闭其他</DropdownItem>
-        </DropdownMenu>
-      </Dropdown>
-    </div>
-    <ul v-show="visible" :style="{left: contextMenuLeft + 'px', top: contextMenuTop + 'px'}" class="contextmenu">
-      <li v-for="(item, key) of menuList" @click="handleTagsOption(key)" :key="key">{{item}}</li>
-    </ul>
-    <div class="btn-con left-btn">
-      <Button type="text" @click="handleScroll(240)">
-        <Icon :size="18" type="ios-arrow-back" />
+<div class="tags-nav">
+  <div class="close-con">
+    <Dropdown transfer @on-click="handleTagsOption" style="margin-top:7px;">
+      <Button size="small" type="text">
+        <Icon :size="18" type="ios-close-circle-outline" />
       </Button>
-    </div>
-    <div class="btn-con right-btn">
-      <Button type="text" @click="handleScroll(-240)">
-        <Icon :size="18" type="ios-arrow-forward" />
-      </Button>
-    </div>
-    <div class="scroll-outer" ref="scrollOuter" @DOMMouseScroll="handlescroll" @mousewheel="handlescroll">
-      <div ref="scrollBody" class="scroll-body" :style="{left: tagBodyLeft + 'px'}">
-        <transition-group name="taglist-moving-animation">
-          <Tag
-            type="dot"
-            v-for="(item, index) in list"
-            ref="tagsPageOpened"
-            :key="`tag-nav-${index}`"
-            :name="item.name"
-            @on-close="handleClose(item)"
-            @click.native="handleClick(item)"
-            :closable="item.name !== $config.homeName"
-            :color="isCurrentTag(item) ? 'primary' : 'default'"
-            @contextmenu.prevent.native="contextMenu(item, $event)"
-          >{{ showTitleInside(item) }}</Tag>
-        </transition-group>
-      </div>
+      <DropdownMenu slot="list">
+        <DropdownItem name="close-all">关闭所有</DropdownItem>
+        <DropdownItem name="close-others">关闭其他</DropdownItem>
+      </DropdownMenu>
+    </Dropdown>
+  </div>
+  <ul v-show="visible" :style="{left: contextMenuLeft + 'px', top: contextMenuTop + 'px'}" class="contextmenu">
+    <li v-for="(item, key) of menuList" @click="handleTagsOption(key)" :key="key">{{item}}</li>
+  </ul>
+  <div class="btn-con left-btn">
+    <Button type="text" @click="handleScroll(240)">
+      <Icon :size="18" type="ios-arrow-back" />
+    </Button>
+  </div>
+  <div class="btn-con right-btn">
+    <Button type="text" @click="handleScroll(-240)">
+      <Icon :size="18" type="ios-arrow-forward" />
+    </Button>
+  </div>
+  <div class="scroll-outer" ref="scrollOuter" @DOMMouseScroll="handlescroll" @mousewheel="handlescroll">
+    <div ref="scrollBody" class="scroll-body" :style="{left: tagBodyLeft + 'px'}">
+      <transition-group name="taglist-moving-animation">
+        <!-- :closable="item.name !== $config.homeName" -->
+        <!-- 这个是底下的Tag的closable的控制判断 -->
+        <Tag type="dot" v-for="(item, index) in list" ref="tagsPageOpened" :key="`tag-nav-${index}`" :name="item.name" @on-close="handleClose(item)" @click.native="handleClick(item)" :color="isCurrentTag(item) ? 'primary' : 'default'"
+          @contextmenu.prevent.native="contextMenu(item, $event)">{{ showTitleInside(item) }}</Tag>
+      </transition-group>
     </div>
   </div>
+</div>
 </template>
 
 <script>
-import { showTitle, routeEqual } from '@/libs/util'
+import {
+  showTitle,
+  routeEqual
+} from '@/libs/util'
 import beforeClose from '@/router/before-close'
 export default {
   name: 'TagsNav',
@@ -59,7 +54,7 @@ export default {
       }
     }
   },
-  data () {
+  data() {
     return {
       tagBodyLeft: 0,
       rightOffset: 40,
@@ -74,13 +69,21 @@ export default {
     }
   },
   computed: {
-    currentRouteObj () {
-      const { name, params, query } = this.value
-      return { name, params, query }
+    currentRouteObj() {
+      const {
+        name,
+        params,
+        query
+      } = this.value
+      return {
+        name,
+        params,
+        query
+      }
     }
   },
   methods: {
-    handlescroll (e) {
+    handlescroll(e) {
       var type = e.type
       let delta = 0
       if (type === 'DOMMouseScroll' || type === 'mousewheel') {
@@ -88,7 +91,7 @@ export default {
       }
       this.handleScroll(delta)
     },
-    handleScroll (offset) {
+    handleScroll(offset) {
       const outerWidth = this.$refs.scrollOuter.offsetWidth
       const bodyWidth = this.$refs.scrollBody.offsetWidth
       if (offset > 0) {
@@ -105,7 +108,7 @@ export default {
         }
       }
     },
-    handleTagsOption (type) {
+    handleTagsOption(type) {
       if (type.includes('all')) {
         // 关闭所有，除了home
         let res = this.list.filter(item => item.name === this.$config.homeName)
@@ -119,7 +122,7 @@ export default {
         }, 100)
       }
     },
-    handleClose (current) {
+    handleClose(current) {
       if (current.meta && current.meta.beforeCloseName && current.meta.beforeCloseName in beforeClose) {
         new Promise(beforeClose[current.meta.beforeCloseName]).then(close => {
           if (close) {
@@ -130,20 +133,20 @@ export default {
         this.close(current)
       }
     },
-    close (route) {
+    close(route) {
       let res = this.list.filter(item => !routeEqual(route, item))
       this.$emit('on-close', res, undefined, route)
     },
-    handleClick (item) {
+    handleClick(item) {
       this.$emit('input', item)
     },
-    showTitleInside (item) {
+    showTitleInside(item) {
       return showTitle(item, this)
     },
-    isCurrentTag (item) {
+    isCurrentTag(item) {
       return routeEqual(this.currentRouteObj, item)
     },
-    moveToView (tag) {
+    moveToView(tag) {
       const outerWidth = this.$refs.scrollOuter.offsetWidth
       const bodyWidth = this.$refs.scrollBody.offsetWidth
       if (bodyWidth < outerWidth) {
@@ -159,7 +162,7 @@ export default {
         this.tagBodyLeft = -(tag.offsetLeft - (outerWidth - this.outerPadding - tag.offsetWidth))
       }
     },
-    getTagElementByName (name) {
+    getTagElementByName(name) {
       this.$nextTick(() => {
         this.refsTag = this.$refs.tagsPageOpened
         this.refsTag.forEach((item, index) => {
@@ -170,7 +173,7 @@ export default {
         })
       })
     },
-    contextMenu (item, e) {
+    contextMenu(item, e) {
       if (item.name === this.$config.homeName) {
         return
       }
@@ -179,15 +182,15 @@ export default {
       this.contextMenuLeft = e.clientX - offsetLeft + 10
       this.contextMenuTop = e.clientY - 64
     },
-    closeMenu () {
+    closeMenu() {
       this.visible = false
     }
   },
   watch: {
-    '$route' (to) {
+    '$route'(to) {
       this.getTagElementByName(to.name)
     },
-    visible (value) {
+    visible(value) {
       if (value) {
         document.body.addEventListener('click', this.closeMenu)
       } else {
@@ -195,7 +198,7 @@ export default {
       }
     }
   },
-  mounted () {
+  mounted() {
     setTimeout(() => {
       this.getTagElementByName(this.$route.name)
     }, 200)
