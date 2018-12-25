@@ -11,11 +11,13 @@ const resolve = dir => {
 // 如果您的应用程序部署在子路径中，则需要在这指定子路径
 // 例如：https://www.foobar.com/my-app/
 // 需要将它改为'/my-app/'
-const BASE_URL = process.env.NODE_ENV === 'production'
-  ? './'
-  : '/'
-
+const BASE_URL = process.env.NODE_ENV === 'production' ?
+  './' :
+  '/'
 module.exports = {
+  devServer: {
+    open: true,
+  },
   // Project deployment base
   // By default we assume your app will be deployed at the root of a domain,
   // e.g. https://www.my-app.com/
@@ -24,8 +26,8 @@ module.exports = {
   // https://www.foobar.com/my-app/
   // then change this to '/my-app/'
   baseUrl: BASE_URL,
-  outputDir:'YMadmin',
-  assetsDir:'main',
+  outputDir: 'YMadmin',
+  assetsDir: 'main',
   // tweak internal webpack configuration.
   // see https://github.com/vuejs/vue-cli/blob/dev/docs/webpack.md
   // 如果你不需要使用eslint，把lintOnSave设为false即可

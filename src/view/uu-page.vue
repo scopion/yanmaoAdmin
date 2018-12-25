@@ -135,7 +135,7 @@ export default {
               }, '查看收益')
             ])
           }
-        }
+        },
       ],
       Ecolumns: [{
           title: '序号',
@@ -157,17 +157,17 @@ export default {
         {
           title: '区块收益',
           key: 'reward',
-          width: 150
+          width: 130
         },
         {
           title: '昨日支出',
           key: 'amount_s',
-          width: 150
+          width: 130
         },
         {
           title: '盈利值',
           key: 'earnings',
-          width: 200,
+          width: 180,
           render: (h, params) => {
             const row = params.row;
             const color = row.earnings > 0 ? 'success' : 'error';
@@ -178,6 +178,62 @@ export default {
                 color: color
               }
             }, row.earnings + ' ' + text);
+          }
+        },
+        {
+          title: '24H百兆收益',
+          key: 'est_reward',
+          width: 130,
+          render: (h, params) => {
+            return h('div', params.row.est_reward)
+          }
+        },
+        {
+          title: '焱猫矿池算力',
+          key: 'hr1',
+          width: 130,
+          render: (h, params) => {
+            return h('div', params.row.hr1)
+          }
+        },
+        {
+          title: '焱猫矿池算力占比',
+          key: 'proportion',
+          width: 150,
+          render: (h, params) => {
+            return h('div', params.row.proportion)
+          }
+        },
+        {
+          title: 'UU矿池支出',
+          key: 'uu_amount',
+          width: 150,
+          render: (h, params) => {
+            return h('div', params.row.uu_amount)
+          }
+        },
+        {
+          title: 'UU矿池算力',
+          key: 'uu_hr1',
+          width: 150,
+          render: (h, params) => {
+            return h('div', params.row.uu_hr1)
+          }
+        },
+        {
+          title: 'UU矿池结余',
+          key: 'uu_profit',
+          width: 150,
+          render: (h, params) => {
+            return h('div', params.row.uu_profit)
+          }
+        },
+        {
+          title: 'UU矿池收益',
+          key: 'uu_reward',
+          width: 150,
+          render: (h, params) => {
+            return h('div', params.row.uu_reward);
           }
         },
       ],
@@ -317,7 +373,14 @@ export default {
             'amount_s': item.amount_s,
             'amount': item.amount,
             'time': item.time,
-            'earnings': (item.reward - item.amount_s).toFixed(6)
+            'earnings': (item.reward - item.amount_s).toFixed(6),
+            'est_reward': item.est_reward,
+            'hr1': item.hr1,
+            'proportion': item.proportion,
+            'uu_amount': item.uu_amount,
+            'uu_hr1': item.uu_hr1,
+            'uu_profit': item.uu_profit,
+            'uu_reward': item.uu_reward,
           })
           this.loading = false
         })
