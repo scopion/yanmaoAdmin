@@ -66,6 +66,7 @@
 
 <script>
 import Tables from '_c/tables'
+import excel from '@/libs/excel'
 import {
   Wallent, // 获取所有的钱包信息
   Expense, // 矿池收益信息
@@ -73,7 +74,7 @@ import {
   HC_Wallent, // 火池矿池收益信息
   HC_ExpenseTotal, //火池总收益信息
 } from '@/api/data'
-Array.prototype.reArr = function () {
+Array.prototype.reArr = function() {
   var newArr = []
   for (var i = 0; i < this.length; i++) {
     if (newArr.indexOf(this[i]) == -1) {
@@ -93,7 +94,7 @@ export default {
       columns: [{
           title: '序号',
           type: 'index',
-          key: 'wallet',
+          key: 'index',
           width: 70,
           fixed: 'left'
         },
@@ -103,7 +104,7 @@ export default {
           width: 200,
           filters: [],
           filterMultiple: true,
-          filterMethod (value, row) {
+          filterMethod(value, row) {
             // console.log(row)
             // console.log(value)
             if (value === this.filters[value].value) {
@@ -376,9 +377,9 @@ export default {
         const params = {
           title: ['最后提交时间', '钱包地址', '实时算力', '24小时平均算力', '在线矿工', '离线矿工', '总收益'],
           key: ['lastshare', 'wallet', 'hr1', 'hr2', 'online', 'offline', 'paid'],
-          data: this.tableDataSmall,
+          data: this.tableData,
           autoWidth: true,
-          filename: '分类列表'
+          filename: '全部收益表格'
         }
         excel.export_array_to_excel(params)
         this.exportLoading = false
@@ -388,14 +389,12 @@ export default {
     },
     exportExcelFilter() {
       this.$refs.tables_earning.exportCsv({
-        title: ['1', '钱包地址', '实时算力', '24小时平均算力', '在线矿工', '离线矿工', '总收益'],
-        key: ['lastshare', 'wallet', 'hr1', 'hr2', 'online', 'offline', 'paid'],
-        filename: 'Sorting and filtering data',
+        filename: '筛选收益表格' + (new Date().toLocaleString()),
         original: false,
         autoWidth: true
       })
     },
-    filterChange(){
+    filterChange() {
       this.pageSize = 100
     }
   },

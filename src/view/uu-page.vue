@@ -1,3 +1,9 @@
+<style>
+
+
+
+</style>
+
 <template>
 <div>
   <Card>
@@ -72,7 +78,8 @@ import {
   Expense, // 矿池收益信息
   ExpenseTotal, // uu矿池总收益信息
   HC_Expense // 火池矿池收益信息
-} from '@/api/data'
+}
+from '@/api/data'
 Array.prototype.reArr = function() {
   var newArr = []
   for (var i = 0; i < this.length; i++) {
@@ -91,199 +98,173 @@ export default {
     return {
       loading: true,
       columns: [{
-          title: '序号',
-          type: 'index',
-          key: 'wallet',
-          width: 70,
-          fixed: 'left'
-        },
-        {
-          title: '最后提交时间',
-          key: 'lastshare',
-          width: 200,
-          filters: [],
-          filterMultiple: true,
-          filterMethod(value, row) {
-            console.log(row)
-            console.log(value)
-            if (value === this.filters[value].value) {
-              return (row.lastshare).substr(0, 10) === this.filters[value].label
-            }
-          }
-        },
-        {
-          title: '钱包地址',
-          key: 'wallet',
-          width: 400
-        },
-        {
-          title: '实时算力',
-          key: 'hr1',
-          width: 100
-        },
-        {
-          title: '24小时平均算力',
-          key: 'hr2',
-          width: 150
-        },
-        {
-          title: '在线矿工',
-          key: 'online',
-          width: 100
-        },
-        {
-          title: '离线矿工',
-          key: 'offline',
-          width: 100
-        },
-        {
-          title: '总收益',
-          key: 'paid',
-          width: 150
-        },
-        {
-          title: '操作',
-          key: 'lastshare',
-          width: 100,
-          render: (h, params) => {
-            return h('div', [
-              h('Button', {
-                props: {
-                  type: 'success',
-                  size: 'small'
-                },
-                on: {
-                  'click': () => {
-                    this.show(params.row.payments, params.row.wallet)
-                  }
-                }
-              }, '查看收益')
-            ])
+        title: '序号',
+        type: 'index',
+        width: 70,
+        fixed: 'left'
+      }, {
+        title: '最后提交时间',
+        key: 'lastshare',
+        width: 200,
+        filters: [],
+        filterMultiple: true,
+        filterMethod(value, row) {
+          console.log(row)
+          console.log(value)
+          if (value === this.filters[value].value) {
+            return (row.lastshare).substr(0, 10) === this.filters[value].label
           }
         }
-      ],
-      Ecolumns: [{
-          title: '序号',
-          type: 'index',
-          key: 'num',
-          width: 70,
-          fixed: 'left'
-        },
-        {
-          title: '时间',
-          key: 'time',
-          width: 170
-        },
-        {
-          title: '区块数',
-          key: 'num',
-          width: 80
-        },
-        {
-          title: '区块收益',
-          key: 'reward',
-          width: 130
-        },
-        {
-          title: '昨日支出',
-          key: 'amount_s',
-          width: 130
-        },
-        {
-          title: '盈利值',
-          key: 'earnings',
-          width: 180,
-          render: (h, params) => {
-            const row = params.row
-            const color = row.earnings > 0 ? 'success' : 'error'
-            const text = row.earnings > 0 ? '盈利' : '亏损'
-            return h('Tag', {
+      }, {
+        title: '钱包地址',
+        key: 'wallet',
+        width: 400
+      }, {
+        title: '实时算力',
+        key: 'hr1',
+        width: 100
+      }, {
+        title: '24小时平均算力',
+        key: 'hr2',
+        width: 150
+      }, {
+        title: '在线矿工',
+        key: 'online',
+        width: 100
+      }, {
+        title: '离线矿工',
+        key: 'offline',
+        width: 100
+      }, {
+        title: '总收益',
+        key: 'paid',
+        width: 150
+      }, {
+        title: '操作',
+        key: 'lastshare',
+        width: 100,
+        render: (h, params) => {
+          return h('div', [
+            h('Button', {
               props: {
-                type: 'dot',
-                color: color
+                type: 'success',
+                size: 'small'
+              },
+              on: {
+                'click': () => {
+                  this.show(params.row.payments, params.row.wallet)
+                }
               }
-            }, row.earnings + ' ' + text)
-          }
-        },
-        {
-          title: '24H百兆收益',
-          key: 'est_reward',
-          width: 130,
-          render: (h, params) => {
-            return h('div', params.row.est_reward)
-          }
-        },
-        {
-          title: '焱猫矿池算力',
-          key: 'hr1',
-          width: 130,
-          render: (h, params) => {
-            return h('div', params.row.hr1)
-          }
-        },
-        {
-          title: '焱猫矿池算力占比',
-          key: 'proportion',
-          width: 150,
-          render: (h, params) => {
-            return h('div', params.row.proportion)
-          }
-        },
-        {
-          title: 'UU矿池支出',
-          key: 'uu_amount',
-          width: 150,
-          render: (h, params) => {
-            return h('div', params.row.uu_amount)
-          }
-        },
-        {
-          title: 'UU矿池算力',
-          key: 'uu_hr1',
-          width: 150,
-          render: (h, params) => {
-            return h('div', params.row.uu_hr1)
-          }
-        },
-        {
-          title: 'UU矿池结余',
-          key: 'uu_profit',
-          width: 150,
-          render: (h, params) => {
-            return h('div', params.row.uu_profit)
-          }
-        },
-        {
-          title: 'UU矿池收益',
-          key: 'uu_reward',
-          width: 150,
-          render: (h, params) => {
-            return h('div', params.row.uu_reward)
-          }
+            }, '查看收益')
+          ])
         }
-      ],
+      }],
+      Ecolumns: [{
+        title: '序号',
+        type: 'index',
+        key: 'num',
+        width: 70,
+        fixed: 'left'
+      }, {
+        title: '时间',
+        key: 'time',
+        width: 170
+      }, {
+        title: '区块数',
+        key: 'num',
+        width: 80
+      }, {
+        title: '区块收益',
+        key: 'reward',
+        width: 130
+      }, {
+        title: '昨日支出',
+        key: 'amount_s',
+        width: 130
+      }, {
+        title: '盈利值',
+        key: 'earnings',
+        width: 180,
+        render: (h, params) => {
+          const row = params.row
+          const color = row.earnings > 0 ? 'success' : 'error'
+          const text = row.earnings > 0 ? '盈利' : '亏损'
+          return h('Tag', {
+            props: {
+              type: 'dot',
+              color: color
+            }
+          }, row.earnings + ' ' + text)
+        }
+      }, {
+        title: '24H百兆收益',
+        key: 'est_reward',
+        width: 130,
+        render: (h, params) => {
+          return h('div', params.row.est_reward)
+        }
+      }, {
+        title: '焱猫矿池算力',
+        key: 'hr1',
+        width: 130,
+        render: (h, params) => {
+          return h('div', params.row.hr1)
+        }
+      }, {
+        title: '焱猫矿池算力占比',
+        key: 'proportion',
+        width: 150,
+        render: (h, params) => {
+          return h('div', params.row.proportion)
+        }
+      }, {
+        title: 'UU矿池支出',
+        key: 'uu_amount',
+        width: 150,
+        render: (h, params) => {
+          return h('div', params.row.uu_amount)
+        }
+      }, {
+        title: 'UU矿池算力',
+        key: 'uu_hr1',
+        width: 150,
+        render: (h, params) => {
+          return h('div', params.row.uu_hr1)
+        }
+      }, {
+        title: 'UU矿池结余',
+        key: 'uu_profit',
+        width: 150,
+        render: (h, params) => {
+          return h('div', params.row.uu_profit)
+        }
+      }, {
+        title: 'UU矿池收益',
+        key: 'uu_reward',
+        width: 150,
+        render: (h, params) => {
+          return h('div', params.row.uu_reward)
+        }
+      }],
       Pcolumns: [{
-          title: '序号',
-          type: 'index',
-          key: 'num',
-          width: 70,
-          fixed: 'left'
-        }, {
-          title: '交易hash值',
-          key: 'txid',
-          width: 550
-        },
-        {
-          title: '转账金额',
-          key: 'amount',
-          width: 150
-        },
-        {
-          title: '转账时间',
-          key: 'time',
-          width: 200
-        }
-      ],
+        title: '序号',
+        type: 'index',
+        key: 'num',
+        width: 70,
+        fixed: 'left'
+      }, {
+        title: '交易hash值',
+        key: 'txid',
+        width: 550
+      }, {
+        title: '转账金额',
+        key: 'amount',
+        width: 150
+      }, {
+        title: '转账时间',
+        key: 'time',
+        width: 200
+      }],
       // 钱包收益
       tableData: [],
       tableDataSmall: [],
@@ -369,9 +350,9 @@ export default {
         const params = {
           title: ['最后提交时间', '钱包地址', '实时算力', '24小时平均算力', '在线矿工', '离线矿工', '总收益'],
           key: ['lastshare', 'wallet', 'hr1', 'hr2', 'online', 'offline', 'paid'],
-          data: this.tableDataSmall,
+          data: this.tableData,
           autoWidth: true,
-          filename: '分类列表'
+          filename: '全部收益表格'
         }
         excel.export_array_to_excel(params)
         this.exportLoading = false
@@ -381,14 +362,12 @@ export default {
     },
     exportExcelFilter() {
       this.$refs.tables_earning.exportCsv({
-        title: ['1', '钱包地址', '实时算力', '24小时平均算力', '在线矿工', '离线矿工', '总收益'],
-        key: ['lastshare', 'wallet', 'hr1', 'hr2', 'online', 'offline', 'paid'],
-        filename: 'Sorting and filtering data',
+        filename: '筛选收益表格' + (new Date().toLocaleString()),
         original: false,
         autoWidth: true
       })
     },
-    filterChange(){
+    filterChange() {
       this.pageSize = 100
     }
   },
@@ -488,7 +467,3 @@ export default {
   }
 }
 </script>
-
-<style>
-
-</style>
