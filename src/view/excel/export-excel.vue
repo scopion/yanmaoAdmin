@@ -36,8 +36,8 @@ export default {
       ],
       tableData: [
         {
-          category1: 1,
-          category2: 2,
+          category1: '这个货',
+          category2: '这个货',
           category3: 3
         },
         {

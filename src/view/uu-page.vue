@@ -26,10 +26,16 @@
         </Row>
       </TabPane>
       <TabPane label="钱包收益" name="name3">
+        <Card title="导出EXCEL" style="marginBottom:1rem">
+          <Row>
+            <Button type="success" size="large" icon="md-download" :loading="exportLoading" @click="exportExcel" style="marginRight:1rem">导出所有数据</Button>
+            <Button type="primary" size="large" icon="md-download" :loading="exportLoading" @click="exportExcelFilter">导出排序数据</Button>
+          </Row>
+        </Card>
         <Row type="flex" justify="center">
           <Col span="24">
           <Card>
-            <tables ref="tables" :loading="loading" size="small" border searchable search-place="top" v-model="tableDataSmall" :columns="columns" />
+            <tables v-if="filterList" ref="tables_earning" :loading="loading" size="small" border searchable search-place="top" v-model="tableDataSmall" :columns="columns" />
             <div style="margin: 10px;overflow: hidden">
               <div style="float: right;">
                 <Page :total="tableData.length" :current="current" :page-size-opts="[10,50,100]" placement="top" @on-change="changePage" show-sizer :page-size="pageSize" @on-page-size-change="changeSize"></Page>
@@ -59,7 +65,17 @@
 </template>
 
 <script>
+Array.prototype.reArr = function() {
+  var newArr = [];
+  for (var i = 0; i < this.length; i++) {
+    if (newArr.indexOf(this[i]) == -1) {
+      newArr.push(this[i]);
+    }
+  }
+  return newArr;
+}
 import Tables from '_c/tables'
+import excel from '@/libs/excel'
 import {
   Wallent, // 获取所有的钱包信息
   Expense, // 矿池收益信息
@@ -84,12 +100,26 @@ export default {
         {
           title: '最后提交时间',
           key: 'lastshare',
-          width: 200
+          width: 200,
+          filters: [],
+          filterMultiple: true,
+          filterMethod(value, row) {
+            console.log(row);
+            console.log(value);
+            if (value === 0) {
+              return (row.lastshare).substr(0, 10) === this.filters[0].label
+            } else if (value === 1) {
+              return (row.lastshare).substr(0, 10) === this.filters[1].label
+            }
+            // if (value === row._index) {
+            //   return (row.lastshare).substr(0, 10) === this.filters[row._index].label
+            // }
+          }
         },
         {
           title: '钱包地址',
           key: 'wallet',
-          width: 330
+          width: 400
         },
         {
           title: '实时算力',
@@ -125,7 +155,7 @@ export default {
               h('Button', {
                 props: {
                   type: 'success',
-                  size: 'small',
+                  size: 'small'
                 },
                 on: {
                   'click': () => {
@@ -135,14 +165,14 @@ export default {
               }, '查看收益')
             ])
           }
-        },
+        }
       ],
       Ecolumns: [{
           title: '序号',
           type: 'index',
           key: 'num',
           width: 70,
-          fixed: 'left',
+          fixed: 'left'
         },
         {
           title: '时间',
@@ -152,7 +182,7 @@ export default {
         {
           title: '区块数',
           key: 'num',
-          width: 80,
+          width: 80
         },
         {
           title: '区块收益',
@@ -169,15 +199,15 @@ export default {
           key: 'earnings',
           width: 180,
           render: (h, params) => {
-            const row = params.row;
-            const color = row.earnings > 0 ? 'success' : 'error';
-            const text = row.earnings > 0 ? '盈利' : '亏损';
+            const row = params.row
+            const color = row.earnings > 0 ? 'success' : 'error'
+            const text = row.earnings > 0 ? '盈利' : '亏损'
             return h('Tag', {
               props: {
                 type: 'dot',
                 color: color
               }
-            }, row.earnings + ' ' + text);
+            }, row.earnings + ' ' + text)
           }
         },
         {
@@ -233,16 +263,16 @@ export default {
           key: 'uu_reward',
           width: 150,
           render: (h, params) => {
-            return h('div', params.row.uu_reward);
+            return h('div', params.row.uu_reward)
           }
-        },
+        }
       ],
       Pcolumns: [{
           title: '序号',
           type: 'index',
           key: 'num',
           width: 70,
-          fixed: 'left',
+          fixed: 'left'
         }, {
           title: '交易hash值',
           key: 'txid',
@@ -257,14 +287,14 @@ export default {
           title: '转账时间',
           key: 'time',
           width: 200
-        },
+        }
       ],
       // 钱包收益
       tableData: [],
       tableDataSmall: [],
       current: 1,
       pageSize: 10,
-      //矿池收益详情
+      // 矿池收益详情
       EtableData: [],
       EtableDataSmall: [],
       current1: 1,
@@ -273,13 +303,16 @@ export default {
       EtableDataQuKuaiSum: 0,
       EtableDataMillerSum: 0,
       EtableDataEarningsSum: 0,
-      //钱包收益详情
+      // 钱包收益详情
       title: '',
       PtableData: [],
       PtableDataSmall: [],
       current2: 1,
       pageSize2: 10,
-      modal: false
+      modal: false,
+      exportLoading: false, // 导出表格读取动画
+      filterDate: [], //筛选过后的数据
+      filterList: []
     }
   },
   methods: {
@@ -290,7 +323,7 @@ export default {
       this.current = val
     },
     changeSize(val) {
-      this.pageSize = val
+      this.pageSize = 5000
     },
     changePage1(val) {
       this.current1 = val
@@ -304,10 +337,10 @@ export default {
     changeSize2(val) {
       this.pageSize2 = val
     },
-    checkDataMax(a, b, c, d) { //a:当前显示的表格信息b:当前表格对应的所有信息c:当前的页数d:当前的每页显示数量
-      a.splice(0, a.length) //清空当前的显示数据
+    checkDataMax(a, b, c, d) { // a:当前显示的表格信息b:当前表格对应的所有信息c:当前的页数d:当前的每页显示数量
+      a.splice(0, a.length) // 清空当前的显示数据
       for (let i = d * (c - 1) + 1; i <= ((b.length > d * c) ? (d * c) : (b.length)); i++) {
-        a.push(b[i - 1]);
+        a.push(b[i - 1])
       }
     },
     show(data, wallet) {
@@ -316,24 +349,49 @@ export default {
       this.title = '钱包: ' + wallet + ' 收益明细'
       if (this.PtableData.length > 0) {
         for (let i = 0; i < (this.PtableData.length >= this.pageSize ? this.pageSize : this.PtableData.length); i++) {
-          this.PtableDataSmall.push(this.PtableData[i]);
+          this.PtableDataSmall.push(this.PtableData[i])
         };
       };
-      console.log(data);
+      console.log(data)
     },
     ok() {
-      this.$Message.info('确定');
-      this.PtableDataSmall = [];
-      this.PtableData = [];
-      this.current2 = 1;
-      this.pageSize2 = 10;
+      this.$Message.info('确定')
+      this.PtableDataSmall = []
+      this.PtableData = []
+      this.current2 = 1
+      this.pageSize2 = 10
     },
     cancel() {
-      this.$Message.info('取消');
-      this.PtableDataSmall = [];
-      this.PtableData = [];
-      this.current2 = 1;
-      this.pageSize2 = 10;
+      this.$Message.info('取消')
+      this.PtableDataSmall = []
+      this.PtableData = []
+      this.current2 = 1
+      this.pageSize2 = 10
+    },
+    exportExcel() {
+      if (this.tableData.length) {
+        this.exportLoading = true
+        const params = {
+          title: ['最后提交时间', '钱包地址', '实时算力', '24小时平均算力', '在线矿工', '离线矿工', '总收益'],
+          key: ['lastshare', 'wallet', 'hr1', 'hr2', 'online', 'offline', 'paid'],
+          data: this.tableDataSmall,
+          autoWidth: true,
+          filename: '分类列表'
+        }
+        excel.export_array_to_excel(params)
+        this.exportLoading = false
+      } else {
+        this.$Message.info('表格数据不能为空！')
+      }
+    },
+    exportExcelFilter() {
+      this.$refs.tables_earning.exportCsv({
+        title: ['1', '钱包地址', '实时算力', '24小时平均算力', '在线矿工', '离线矿工', '总收益'],
+        key: ['lastshare', 'wallet', 'hr1', 'hr2', 'online', 'offline', 'paid'],
+        filename: 'Sorting and filtering data',
+        original: false,
+        autoWidth: true,
+      });
     }
   },
   watch: {
@@ -354,7 +412,7 @@ export default {
     },
     pageSize2: function() {
       this.checkDataMax(this.PtableDataSmall, this.PtableData, this.current2, this.pageSize2)
-    },
+    }
   },
   mounted() {
     Expense().then(res => {
@@ -380,7 +438,7 @@ export default {
             'uu_amount': item.uu_amount,
             'uu_hr1': item.uu_hr1,
             'uu_profit': item.uu_profit,
-            'uu_reward': item.uu_reward,
+            'uu_reward': item.uu_reward
           })
           this.loading = false
         })
@@ -391,7 +449,7 @@ export default {
         }
       }),
       ExpenseTotal().then(res => {
-        console.log(res, "总收益信息");
+        console.log(res, '总收益信息')
         this.EtableDataBlockSum = res.data.msg.num
         this.EtableDataQuKuaiSum = res.data.msg.reward
         this.EtableDataMillerSum = res.data.msg.amount
@@ -400,6 +458,8 @@ export default {
       Wallent().then(res => {
         console.log(res)
         res.data.forEach((item) => {
+          this.filterDate.push((item.lastshare).substr(0, 10)) //获取日期的年月日
+          this.filterDate = (this.filterDate).reArr() //数组去重
           this.tableData.push({
             'hr1': item.hr1,
             'hr2': item.hr2,
@@ -408,9 +468,18 @@ export default {
             'paid': item.paid,
             'wallet': item.wallet,
             'lastshare': item.lastshare,
-            'payments': item.payments,
+            'payments': item.payments
           })
         })
+        this.filterDate.forEach((item, index) => {
+          this.filterList.push({
+            label: item,
+            value: index,
+          })
+        })
+        this.$set(this.columns[1], 'filters', this.filterList) //强制修改数据
+        console.log(this.filterDate);
+        console.log(this.filterList);
         if (this.tableData.length > 0) {
           for (let i = 0; i < (this.tableData.length >= this.pageSize ? this.pageSize : this.tableData.length); i++) {
             this.tableDataSmall.push(this.tableData[i])
