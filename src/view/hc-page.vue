@@ -26,10 +26,16 @@
         </Row>
       </TabPane>
       <TabPane label="钱包收益" name="name2">
+        <Card title="导出EXCEL" style="marginBottom:1rem">
+          <Row>
+            <Button type="success" size="large" icon="md-download" :loading="exportLoading" @click="exportExcel" style="marginRight:1rem">导出所有数据</Button>
+            <Button type="primary" size="large" icon="md-download" :loading="exportLoading" @click="exportExcelFilter">导出排序数据</Button>
+          </Row>
+        </Card>
         <Row type="flex" justify="center">
           <Col span="24">
           <Card>
-            <tables ref="tables" :loading="loading" size="small" border searchable search-place="top" v-model="tableDataSmall" :columns="columns" />
+            <tables v-if="filterList" ref="tables_earning" :loading="loading" @on-filter-change="filterChange" size="small" border searchable search-place="top" v-model="tableDataSmall" :columns="columns" />
             <div style="margin: 10px;overflow: hidden">
               <div style="float: right;">
                 <Page :total="tableData.length" :current="current" :page-size-opts="[10,50,100]" placement="top" @on-change="changePage" show-sizer :page-size="pageSize" @on-page-size-change="changeSize"></Page>
@@ -67,6 +73,15 @@ import {
   HC_Wallent, // 火池矿池收益信息
   HC_ExpenseTotal, //火池总收益信息
 } from '@/api/data'
+Array.prototype.reArr = function () {
+  var newArr = []
+  for (var i = 0; i < this.length; i++) {
+    if (newArr.indexOf(this[i]) == -1) {
+      newArr.push(this[i])
+    }
+  }
+  return newArr
+}
 export default {
   name: 'tables_page',
   components: {
@@ -85,7 +100,16 @@ export default {
         {
           title: '最后提交时间',
           key: 'lastshare',
-          width: 200
+          width: 200,
+          filters: [],
+          filterMultiple: true,
+          filterMethod (value, row) {
+            // console.log(row)
+            // console.log(value)
+            if (value === this.filters[value].value) {
+              return (row.lastshare).substr(0, 10) === this.filters[value].label
+            }
+          }
         },
         {
           title: '钱包地址',
@@ -285,7 +309,10 @@ export default {
       PtableDataSmall: [],
       current2: 1,
       pageSize2: 10,
-      modal: false
+      modal: false,
+      exportLoading: false, // 导出表格读取动画
+      filterDate: [], // 筛选过后的数据
+      filterList: []
     }
   },
   methods: {
@@ -342,6 +369,34 @@ export default {
       this.PtableData = [];
       this.current2 = 1;
       this.pageSize2 = 10;
+    },
+    exportExcel() {
+      if (this.tableData.length) {
+        this.exportLoading = true
+        const params = {
+          title: ['最后提交时间', '钱包地址', '实时算力', '24小时平均算力', '在线矿工', '离线矿工', '总收益'],
+          key: ['lastshare', 'wallet', 'hr1', 'hr2', 'online', 'offline', 'paid'],
+          data: this.tableDataSmall,
+          autoWidth: true,
+          filename: '分类列表'
+        }
+        excel.export_array_to_excel(params)
+        this.exportLoading = false
+      } else {
+        this.$Message.info('表格数据不能为空！')
+      }
+    },
+    exportExcelFilter() {
+      this.$refs.tables_earning.exportCsv({
+        title: ['1', '钱包地址', '实时算力', '24小时平均算力', '在线矿工', '离线矿工', '总收益'],
+        key: ['lastshare', 'wallet', 'hr1', 'hr2', 'online', 'offline', 'paid'],
+        filename: 'Sorting and filtering data',
+        original: false,
+        autoWidth: true
+      })
+    },
+    filterChange(){
+      this.pageSize = 100
     }
   },
   watch: {
@@ -407,6 +462,8 @@ export default {
       HC_Wallent().then(res => {
         console.log(res, "火池钱包")
         res.data.forEach((item) => {
+          this.filterDate.push((item.lastshare).substr(0, 10)) // 获取日期的年月日
+          this.filterDate = (this.filterDate).reArr() // 数组去重
           this.tableData.push({
             'hr1': item.hr1,
             'hr2': item.hr2,
@@ -418,6 +475,16 @@ export default {
             'payments': item.payments,
           })
         })
+
+        this.filterDate.forEach((item, index) => {
+          this.filterList.push({
+            label: item,
+            value: index
+          })
+        })
+        this.$set(this.columns[1], 'filters', this.filterList) // 强制修改数据
+        console.log(this.filterDate)
+        console.log(this.filterList)
         if (this.tableData.length > 0) {
           for (let i = 0; i < (this.tableData.length >= this.pageSize ? this.pageSize : this.tableData.length); i++) {
             this.tableDataSmall.push(this.tableData[i])
